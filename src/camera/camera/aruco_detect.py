@@ -1,19 +1,25 @@
 import rclpy
 from rclpy.node import Node
 from cv_bridge import CvBridge
-from sensor_msgs.msg import CompressedImage
+from sensor_msgs.msg import CompressedImage, Image
 from std_msgs.msg import String
 import cv2
 import numpy as np
 import json
-
+import threading
 class pros_yolo(Node):
 
     def __init__(self):
         super().__init__('yolo_node')
         self.get_logger().info('Node is running')
         self.bridge = CvBridge()
-
+        
+        self.depth_subscription = self.create_subscription(
+                Image,
+                '/camera/depth/image_raw',
+                self.listener_depth_callback,
+                10
+        )
 
         self.subscription = self.create_subscription(
                 CompressedImage,
@@ -43,6 +49,8 @@ class pros_yolo(Node):
         self.__threshold = 100
 
         
+        self.__depth_lock = threading.Lock()
+        self.__depth_image = None
 
     def listener_callback(self, msg):
         self.get_logger().info('Received frame')
@@ -52,10 +60,10 @@ class pros_yolo(Node):
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         ret, binary_image = cv2.threshold(gray, self.__threshold, 255, cv2.THRESH_BINARY)
 
-        aruco_dict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_5X5_100)
-                
+        aruco_dict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_5X5_100)                
         parameters = cv2.aruco.DetectorParameters_create()        
-        corners, ids, rejectedImgPoints = cv2.aruco.detectMarkers(binary_image, aruco_dict, parameters=parameters)
+        corners, ids, rejectedImgPoints = cv2.aruco.detectMarkers(
+            binary_image, aruco_dict, parameters=parameters)
 
         detection_results = []
 
@@ -65,10 +73,35 @@ class pros_yolo(Node):
             for i in range(len(ids)):
                 marker_id = int(ids[i][0])
                 corner = corners[i][0].tolist()
+                
+                depths = []
+                
+                for j in range(4):
+                    x = int(corner[j][0])
+                    y = int(corner[j][1])
+                
+                    height, width = frame.shape[:2]
+                    if x < 0 or x >= width or y < 0 or y >= height:
+                        self.get_logger().warning(f'Corner coordinates out of bounds: ({x}, {y})')
+                        depth_value = float('nan')
+                    else:                    
+                        with self.__depth_lock:
+                            if self.__depth_image is not None:                                
+                                if y < self.__depth_image.shape[0] and x < self.__depth_image.shape[1]:
+                                    depth_value = self.__depth_image[y, x]
+                                    self.get_logger().info(f'Depth at point ({x}, {y}): {depth_value} mm')
+                                else:
+                                    self.get_logger().warning('Depth image size mismatch.')
+                                    depth_value = float('nan')
+                            else:
+                                self.get_logger().warning('Depth image not available.')
+                                depth_value = float('nan')
+                    depths.append(float(depth_value))
 
                 detection_results.append({
                     'id' : marker_id,
-                    'corners' : corner
+                    'corners' : corner,
+                    'depth' : depths
                 })
             
             detection_info = json.dumps(detection_results)
@@ -89,8 +122,12 @@ class pros_yolo(Node):
         string_msg.data  = detection_info
         self.__arucoData_pub.publish(string_msg)
 
-                
-        
+    def listener_depth_callback(self, data):
+        with self.__depth_lock:
+            self.__depth_image = self.bridge.imgmsg_to_cv2(
+                data, desired_encoding="passthrough"
+            )
+
 def main():
     rclpy.init()
     node = pros_yolo()
