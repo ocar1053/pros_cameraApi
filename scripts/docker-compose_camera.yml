@@ -1,0 +1,18 @@
+version: '3.7'
+
+services:
+  camera:
+    image: ghcr.io/otischung/pros_ai_image:latest
+    network_mode: host
+    devices:
+      - "/dev/video0:/dev/video0"
+      - "/dev/video1:/dev/video1"
+    privileged: true
+    command: "ros2 launch astra_camera astro_pro_plus.launch.xml"
+  
+  compress:
+    image: ghcr.io/otischung/pros_ai_image:latest
+    network_mode: host
+    depends_on:
+      - camera
+    command: "ros2 run image_transport republish raw --ros-args --remap in:=camera/color/image_raw -p out:=camera/compressed"
