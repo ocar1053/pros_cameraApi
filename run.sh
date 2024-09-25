@@ -8,11 +8,11 @@ if ! command -v docker &> /dev/null
 then
     echo "not install docker"
 else    
-    if ! docker images --format '{{.Repository}}:{{.Tag}}' | grep 'camera_image:local'; then
-        echo "camera_image:local not found. Building the Docker image...."
-        docker build -t camera_image:local .
+    if ! docker images --format '{{.Repository}}:{{.Tag}}' | grep $DOCKER_IMAGE; then
+        echo "$DOCKER_IMAGE not found. Building the Docker image...."
+        docker build -t $DOCKER_IMAGE .
     else
-        echo "camera_image:local already exists."
+        echo "$DOCKER_IMAGE already exists."
     fi
 fi
 

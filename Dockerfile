@@ -2,7 +2,7 @@ FROM ghcr.io/screamlab/pros_base_image:0.0.0
 ENV ROS_DISTRO=humble
 
 COPY . /tmp
-RUN mv /tmp/src/camera /workspaces/src
+RUN mv /tmp/src /workspaces/src
     
 WORKDIR /workspaces
 

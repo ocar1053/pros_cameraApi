@@ -20,7 +20,9 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            "image_subscriber = camera.image_subscriber:main"
+            "image_subscriber = camera.image_subscriber:main",
+            "aruco_detect = camera.aruco_detect:main",
+            "get_worldPosition = camera.get_worldPosition:main",
         ],
     },
 )

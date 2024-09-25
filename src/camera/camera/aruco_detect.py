@@ -101,7 +101,7 @@ class pros_yolo(Node):
                 detection_results.append({
                     'id' : marker_id,
                     'corners' : corner,
-                    'depth' : depths
+                    'depths' : depths
                 })
             
             detection_info = json.dumps(detection_results)
