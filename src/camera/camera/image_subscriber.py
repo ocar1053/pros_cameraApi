@@ -16,7 +16,7 @@ class ImageSubscriber(Node):
         self.br = CvBridge()
         self.counter = 0  # Initialize counter
 
-        self.save_folder = 'images_folder'
+        self.save_folder = '/workspaces/src/camera/images_folder'
         if not os.path.exists(self.save_folder):
             os.makedirs(self.save_folder)
 
