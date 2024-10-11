@@ -1,2 +1,6 @@
 /camera_output
 */camera_output
+
+#add pycache to gitignore
+*.pyc
+__pycache__/
