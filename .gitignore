@@ -4,3 +4,5 @@
 #add pycache to gitignore
 *.pyc
 __pycache__/
+*pkl
+*.pt
