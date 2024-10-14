@@ -9,6 +9,10 @@ WORKDIR /workspaces
 # bootstrap rosdep
 RUN apt update && rosdep update --rosdistro $ROS_DISTRO && \
     apt-get install ros-$ROS_DISTRO-vision-opencv -y && \
+    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118 && \
+    pip install ultralytics && \   
+    pip install opencv-contrib-python==4.6.0.66 && \
+    pip install numpy==1.25.0 && \
 # setup colcon mixin and metadata
     colcon mixin update && \
     colcon metadata update && \

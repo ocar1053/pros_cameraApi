@@ -23,6 +23,7 @@ setup(
             "image_subscriber = camera.image_subscriber:main",
             "aruco_detect = camera.aruco_detect:main",
             "get_worldPosition = camera.get_worldPosition:main",
+            "yolo_detect = camera.yolo_detect:main"
         ],
     },
 )
