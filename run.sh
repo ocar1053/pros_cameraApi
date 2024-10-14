@@ -1,19 +1,12 @@
 #!/bin/bash
 
-DOCKER_IMAGE="camera_image:local"
+DOCKER_IMAGE="ghcr.io/screamlab/pros_cameraapi:latest"
 DOCKER_NETWORK="scripts_my_bridge_network"
 
 
-if ! command -v docker &> /dev/null
-then
-    echo "not install docker"
-else    
-    if ! docker images --format '{{.Repository}}:{{.Tag}}' | grep $DOCKER_IMAGE; then
-        echo "$DOCKER_IMAGE not found. Building the Docker image...."
-        docker build -t $DOCKER_IMAGE .
-    else
-        echo "$DOCKER_IMAGE already exists."
-    fi
+# Create a network if it doesn't exist
+if [ -z "$(docker network ls --filter name=$DOCKER_NETWORK --quiet)" ]; then
+    docker network create $DOCKER_NETWORK
 fi
 
 
