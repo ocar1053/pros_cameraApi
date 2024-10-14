@@ -16,7 +16,7 @@ class Pros_pokemon_yolo(Node):
 
     def __init__(self):
         super().__init__('pokemon_yolo_node')
-        self.model_name = 'yolov8n.pt'
+        self.model_name = 'best_tech_girl.pt'
         self.get_logger().info('Pokemon Node is running using ' + self.model_name)
         self.bridge = CvBridge()
         self.current_dir = os.path.dirname(os.path.realpath(__file__))
@@ -79,7 +79,7 @@ class Pros_pokemon_yolo(Node):
         frame = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
 
         # Perform object detection using YOLOv8
-        results = self.model(frame, conf=0.85)
+        results = self.model(frame,iou=0.3)
 
         detection_results = []
 
@@ -127,12 +127,13 @@ class Pros_pokemon_yolo(Node):
                 cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
                 # Display the label with confidence
-                label_text = f'{label} {conf:.2f}'
+                # label_text = f'{label} {conf:.2f}'
+                label_text = f'{label}'
                 cv2.putText(frame, label_text, (x1, y1 - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (36, 255, 12), 2)
 
                 # Display the world coordinates on the bounding box
                 world_text = f'({world_coords["world_x"]}, {world_coords["world_y"]}, {world_coords["world_z"]})'
-                cv2.putText(frame, world_text, (x1, y1 - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (36, 255, 12), 1)
+                cv2.putText(frame, world_text, (x1-30, y1 - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (36, 255, 12), 1)
 
         if detection_results:
             detection_info = json.dumps(detection_results)
