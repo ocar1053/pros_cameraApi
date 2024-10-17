@@ -7,6 +7,7 @@ import cv2
 import numpy as np
 import json
 import threading
+
 class pros_yolo(Node):
 
     def __init__(self):
@@ -14,16 +15,23 @@ class pros_yolo(Node):
         self.get_logger().info('Node is running')
         self.bridge = CvBridge()
         
+        # create parameter camera_name
+        self.declare_parameter('camera_name', 'real_sense')
+        
+        # load camera_name parameter
+        self.camera_name = self.get_parameter('camera_name').get_parameter_value().string_value
+        self.get_logger().info(f'Using camera: {self.camera_name}')
+
         self.depth_subscription = self.create_subscription(
                 Image,
-                '/camera/depth/image_raw',
+                f'/{self.camera_name}/depth/image_raw',
                 self.listener_depth_callback,
                 10
         )
 
         self.subscription = self.create_subscription(
                 CompressedImage,
-                '/out/compressed',
+                f'/{self.camera_name}/compressed',
                 self.listener_callback,
                 10
         )
