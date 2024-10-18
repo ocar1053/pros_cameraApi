@@ -38,19 +38,19 @@ class pros_yolo(Node):
                 
         self.__processed_image_pub = self.create_publisher(
                 CompressedImage,
-                '/processed_image/compressed',
+                f'/{self.camera_name}/processed_image/compressed',
                 10
         )
         
         self.__processed_binaryimage_pub = self.create_publisher(
                 CompressedImage,
-                '/processed_binaryimage_pub',
+                f'/{self.camera_name}/processed_binaryimage_pub',
                 10
         )
         
         self.__arucoData_pub = self.create_publisher(
                 String,
-                'aruco_detection',
+                f'/{self.camera_name}/aruco_detection',
                 10
         )
 

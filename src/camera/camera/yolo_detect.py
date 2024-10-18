@@ -25,9 +25,16 @@ class Pros_pokemon_yolo(Node):
 
         self.__depth_lock = threading.Lock()
         self.__depth_image = None
+    
 
+        # create parameter camera_name
+        self.declare_parameter('camera_name', 'real_sense')
+        
+        # load camera_name parameter
+        self.camera_name = self.get_parameter('camera_name').get_parameter_value().string_value
+        self.get_logger().info(f'Using camera: {self.camera_name}')
         # Load camera parameters for world coordinate transformation
-        with open("/workspaces/src/camera/resource/camera.pkl", "rb") as infile:
+        with open(f"/workspaces/src/camera/resource/{self.camera_name}.pkl", "rb") as infile:
             camera = pickle.load(infile)
             camera_matrix = camera["camera_matrix"]
             extrinsic_matrix = camera["extrinsic_matrix"]
@@ -39,7 +46,7 @@ class Pros_pokemon_yolo(Node):
         # Subscribe to the depth image topic
         self.depth_subscription = self.create_subscription(
             Image,
-            '/camera/depth/image_raw',
+            f'/{self.camera_name}/depth/image_raw',
             self.listener_depth_callback,
             10
         )
@@ -47,7 +54,7 @@ class Pros_pokemon_yolo(Node):
         # Subscribe to the compressed image topic
         self.subscription = self.create_subscription(
             CompressedImage,
-            '/out/compressed',
+            f'/{self.camera_name}/compressed',
             self.listener_callback,
             10
         )
@@ -55,14 +62,14 @@ class Pros_pokemon_yolo(Node):
         # Publisher for the processed image
         self.processed_image_pub = self.create_publisher(
             CompressedImage,
-            '/processed_image_yolo_pokemon/compressed',
+            f'/{self.camera_name}/processed_image_yolo_pokemon/compressed',
             10
         )
 
         # Publisher for the detection data
         self.detection_data_pub = self.create_publisher(
             String,
-            '/detection_data/yolo_pokemon',
+            f'/{self.camera_name}/detection_data/yolo_pokemon',
             10
         )
 

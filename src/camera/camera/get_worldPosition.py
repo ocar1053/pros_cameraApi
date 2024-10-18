@@ -9,20 +9,27 @@ import numpy as np
 class ArucoDepthSubscriber(Node):
     def __init__(self):
         super().__init__('aruco_depth_subscriber')
+         # create parameter camera_name
+        self.declare_parameter('camera_name', 'real_sense')
+        
+        # load camera_name parameter
+        self.camera_name = self.get_parameter('camera_name').get_parameter_value().string_value
+        self.get_logger().info(f'Using camera: {self.camera_name}')
+
         self.subscription = self.create_subscription(
             String,
-            'aruco_detection',
+            'f'/{self.camera_name}/aruco_detection',
             self.listener_callback,
             10)
         self.subscription 
 
         self.position_pub = self.create_publisher(
             String,
-            'position',
+            f'/{self.camera_name}/position',
             10
         )
 
-        with open("/workspaces/src/camera/resource/camera.pkl", "rb") as infile:
+        with open(f"/workspaces/src/camera/resource/{self.camera_name}.pkl", "rb") as infile:
             camera = pickle.load(infile)
             camera_matrix = camera["camera_matrix"]
             extrinsic_matrix = camera["extrinsic_matrix"]

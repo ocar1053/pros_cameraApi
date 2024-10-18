@@ -5,7 +5,8 @@ import pickle
 
     
 class convert_camera_coordinates:
-    def __init__(self, camera_matrix, extrinsic_matrix, rotation_matrix, camera_transfrom):
+    def __init__(self, camera_matrix, extrinsic_matrix, rotation_matrix, camera_transfrom, camera_name=""):
+        self.camera_name = camera_name
         self.camera_matrix = camera_matrix
         self.extrinsic_matrix = extrinsic_matrix
         self.rotation_matrix = rotation_matrix
@@ -76,20 +77,22 @@ class convert_camera_coordinates:
         cv2.imshow(f"img", ori_img)
         cv2.waitKey(0)
 
+"""
+following for unity test
+"""
+# if __name__ == "__main__":
+#     with open("/workspaces/src/camera/resource/camera.pkl", "rb") as infile:
+#         camera = pickle.load(infile)
+#         camera_matrix = camera["camera_matrix"]
+#         extrinsic_matrix = camera["extrinsic_matrix"]
+#         rotation_matrix = camera["rotation_matrix"]
 
-if __name__ == "__main__":
-    with open("/workspaces/src/camera/resource/camera.pkl", "rb") as infile:
-        camera = pickle.load(infile)
-        camera_matrix = camera["camera_matrix"]
-        extrinsic_matrix = camera["extrinsic_matrix"]
-        rotation_matrix = camera["rotation_matrix"]
-
-    # camera_transfrom = np.array( [[-0.06731904246012932, 0.5621164011804152, 1.4118532933329546]] )
-    camera_transfrom = extrinsic_matrix[:,-1][:-1].reshape(1, -1)
-    convert_camera = convert_camera_coordinates(camera_matrix, extrinsic_matrix, rotation_matrix, camera_transfrom)
-    scream_points = np.array(
-        [[180.0, 340.0, 1]]
-    )
-    depth = 1.6
+#     # camera_transfrom = np.array( [[-0.06731904246012932, 0.5621164011804152, 1.4118532933329546]] )
+#     camera_transfrom = extrinsic_matrix[:,-1][:-1].reshape(1, -1)
+#     convert_camera = convert_camera_coordinates(camera_matrix, extrinsic_matrix, rotation_matrix, camera_transfrom)
+#     scream_points = np.array(
+#         [[180.0, 340.0, 1]]
+#     )
+#     depth = 1.6
     
-    print(convert_camera.screen_point_to_world_point(scream_points, depth))
+#     print(convert_camera.screen_point_to_world_point(scream_points, depth))
