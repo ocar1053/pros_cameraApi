@@ -1,7 +1,7 @@
 #!/bin/bash
 
 DOCKER_IMAGE="ghcr.io/screamlab/pros_cameraapi:latest"
-DOCKER_NETWORK="scripts_my_bridge_network"
+DOCKER_NETWORK="compose_my_bridge_network"
 
 
 # Create a network if it doesn't exist
